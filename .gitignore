@@ -1,0 +1,40 @@
+# Dossiers générés par le gestionnaire de paquets
+node_modules/
+bun.lockb # Souvent généré et géré par Bun, peut être ignoré si vous ne voulez pas le versionner
+
+# Fichiers de sortie/build
+out/
+dist/
+*.tgz
+
+# Dossiers de couverture de code et rapports
+coverage/
+*.lcov
+report.[0-9]_[0-9]_[0-9]_[0-9]_.json # Fusionne et généralise vos entrées de rapports
+
+# Fichiers de logs
+*.log # Inclut tous les fichiers .log
+# _/.log est une erreur de frappe. Utiliser plutôt *.log pour couvrir tous les logs.
+
+# Fichiers de configuration sensibles et variables d'environnement
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Caches
+.eslintcache
+.cache/ # Ignorer le dossier .cache
+*.tsbuildinfo # Fichiers de cache TypeScript
+
+# Fichiers spécifiques aux IDEs (Environnements de Développement Intégrés)
+.idea/ # IntelliJ based IDEs (PyCharm, WebStorm, etc.)
+.vscode/ # Visual Studio Code
+*.iml # Fichiers de module IntelliJ
+
+# Fichiers spécifiques au système d'exploitation
+.DS_Store # macOS Finder
+
+# Dépôt Git imbriqué à ignorer (celui que vous avez cloné par erreur à la racine du projet)
+donnesante/

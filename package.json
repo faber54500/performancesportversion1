@@ -1,0 +1,23 @@
+{
+  "name": "sport-performance-api",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.2.15",
+    "@types/node": "^24.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.0",
+    "dotenv": "^16.5.0",
+    "hono": "^4.7.11",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.1",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.24",
+    "zod": "^3.25.61"
+  }
+}
