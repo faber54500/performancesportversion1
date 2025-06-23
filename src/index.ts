@@ -1,7 +1,5 @@
 // index.ts
 
-import "reflect-metadata"; // CETTE LIGNE EST ESSENTIELLE ET DOIT ÊTRE LA PREMIÈRE
-
 // Importe l'application Hono configurée depuis app.ts.
 import app from './app';
 // Importe le DataSource de TypeORM pour l'initialisation de la base de données.
