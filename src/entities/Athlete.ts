@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 /**
  * @Entity() indique que cette classe est une entité TypeORM et la lie à une table de base de données.
- * Le nom de la table 'donne_sport' est spécifié pour correspondre à votre schéma SQL.
+ * Le nom de la table 'donne_sport' est spécifié pour correspondre au schéma SQL.
  */
 @Entity({ name: 'donne_sport' })
 export class Athlete {
@@ -16,11 +16,8 @@ export class Athlete {
   @PrimaryGeneratedColumn()
   id!: number; // Le '!' indique que la propriété sera initialisée par TypeORM
 
-  /**
-   * @Column() marque les propriétés comme des colonnes de la table.
-   * Le type TypeScript est déduit, mais des options peuvent être ajoutées
-   * si le type de la base de données diffère ou si des contraintes sont nécessaires.
-   */
+  //@Column() donne les propriétés des colonnes de la table.
+  
   @Column({ type: 'varchar', length: 50, nullable: false })
   Name!: string;
 
