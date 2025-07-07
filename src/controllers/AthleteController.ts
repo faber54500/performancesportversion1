@@ -26,12 +26,39 @@ export class AthleteController {
    */
   public async getAllAthletes(c: Context) {
     try {
-      // Récupère tous les athlètes de la base de données.
-      const athletes = await this.athleteRepository.find();
-      // Retourne une réponse avec le statut 200 OK et les données.
+      // Récupère les paramètres de requête pour le filtrage et le tri
+      const query = c.req.query();
+      // Construction dynamique des filtres TypeORM
+      const filters: any = {};
+      if (query.Name) filters.Name = query.Name;
+      if (query.Gender) filters.Gender = query.Gender;
+      if (query.Age) filters.Age = Number(query.Age);
+      if (query.Weight) filters.Weight = Number(query.Weight);
+      if (query.Runtime) filters.Runtime = Number(query.Runtime);
+      if (query.Oxygen_consumption) filters.Oxygen_consumption = Number(query.Oxygen_consumption);
+      if (query.Run_pulse) filters.Run_pulse = Number(query.Run_pulse);
+      if (query.Res_pulse) filters.Res_pulse = Number(query.Res_pulse);
+      if (query.Maximum_pulse) filters.Maximum_pulse = Number(query.Maximum_pulse);
+      if (query.Performance) filters.Performance = Number(query.Performance);
+      // Ajoutez d'autres filtres selon les besoins
+
+      // Gestion du tri
+      let order: any = undefined;
+      if (query.sort) {
+        const sortField = query.sort;
+        const sortOrder = (query.order && query.order.toLowerCase() === 'desc') ? 'DESC' : 'ASC';
+        order = { [sortField]: sortOrder };
+      }
+
+      // Ajout de l'imbrication des données (relations)
+      const relations = ['programme'];
+
+      // Si aucun filtre, retourne tout (avec ou sans tri)
+      const athletes = Object.keys(filters).length === 0
+        ? await this.athleteRepository.find({ order, relations })
+        : await this.athleteRepository.find({ where: filters, order, relations });
       return c.json(athletes, 200);
     } catch (error) {
-      // Gère les erreurs et retourne une réponse 500 Internal Server Error.
       console.error('Erreur lors de la récupération des athlètes:', error);
       return c.json({ message: 'Erreur interne du serveur lors de la récupération des athlètes.' }, 500);
     }
@@ -52,8 +79,8 @@ export class AthleteController {
         return c.json({ message: 'ID d\'athlète invalide.' }, 400);
       }
 
-      // Cherche un athlète par son ID.
-      const athlete = await this.athleteRepository.findOne({ where: { id } });
+      // Cherche un athlète par son ID avec imbrication du programme.
+      const athlete = await this.athleteRepository.findOne({ where: { id }, relations: ['programme'] });
 
       if (!athlete) {
         // Retourne une erreur 404 Not Found si l'athlète n'est pas trouvé.
