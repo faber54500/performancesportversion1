@@ -64,5 +64,8 @@ privateRoutes.put('/athletes/:id', zValidator('json', athleteSchema.partial()), 
 // Route pour supprimer un athlète par son ID (DELETE).
 privateRoutes.delete('/athletes/:id', athleteController.deleteAthlete.bind(athleteController));
 
+// Route pour lire un athlète par son ID (GET).
+privateRoutes.get('/athletes/:id', athleteController.getAthleteById.bind(athleteController));
+
 // Exporte le routeur privé.
 export { privateRoutes };

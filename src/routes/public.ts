@@ -12,6 +12,8 @@ import { AthleteRepository } from '../repositories/AthleteRepository';
 import { AthleteService } from '../services/AthleteService';
 // Importe l'entité Athlete. <-- LIGNE AJOUTÉE
 import { Athlete } from '../entities/Athlete'; // <-- LIGNE AJOUTÉE
+// Importe le middleware apiKeyMiddleware
+import { apiKeyMiddleware } from '../middlewares/apiKeyMiddleware';
 
 // Crée une nouvelle instance de routeur Hono.
 const publicRoutes = new Hono();
@@ -20,7 +22,7 @@ const publicRoutes = new Hono();
 // C'est un exemple simple d'injection de dépendances.
 const athleteRepository = new AthleteRepository(AppDataSource.getRepository(Athlete));
 const athleteService = new AthleteService(athleteRepository);
-const athleteController = new AthleteController(athleteService); // Le contrôleur utilise le service
+const athleteController = new AthleteController(); // Le contrôleur utilise le service
 
 /**
  * Routes Publiques : Accessibles sans aucune authentification.
@@ -32,8 +34,8 @@ const athleteController = new AthleteController(athleteService); // Le contrôle
 // se réfère correctement à l'instance du contrôleur.
 publicRoutes.get('/athletes', athleteController.getAllAthletes.bind(athleteController));
 
-// Route pour récupérer un athlète par son ID.
-publicRoutes.get('/athletes/:id', athleteController.getAthleteById.bind(athleteController));
+// Route pour récupérer un athlète par son ID, protégée par clé d'API
+publicRoutes.get('/athletes/:id', apiKeyMiddleware, athleteController.getAthleteById.bind(athleteController));
 
 // Exporte le routeur public pour être utilisé dans app.ts.
 export { publicRoutes };
