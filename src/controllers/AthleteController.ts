@@ -1,4 +1,4 @@
-// controllers/AthleteController.ts
+// controllers/AthleteController.ts 
 
 // Importe le type Context de Hono pour gérer les requêtes et réponses HTTP.
 import { Context } from 'hono';
@@ -51,7 +51,8 @@ export class AthleteController {
       }
 
       // Ajout de l'imbrication des données (relations)
-      const relations = ['programme'];
+      // Correction : relations seulement si la propriété existe
+      const relations: string[] = [];
 
       // Si aucun filtre, retourne tout (avec ou sans tri)
       const athletes = Object.keys(filters).length === 0
