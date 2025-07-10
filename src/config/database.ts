@@ -1,4 +1,4 @@
-// config/database.ts du 10/07/2025
+// config/database.ts 
 
 
 // Importe la classe DataSource de TypeORM, qui est le point d'entrée pour la connexion à la DB.
@@ -9,6 +9,8 @@ import { Athlete } from '../entities/Athlete';
 import { User } from '../entities/User'; 
 // Importe l'entité Programme qui va permettre de gérer les programmes des athlètes.
 import { Programme } from '../entities/Programme';
+// Importe l'entité ApiKey qui va permettre de gérer les clés API pour l'authentification.
+import { ApiKey } from '../entities/ApiKey'; 
 // Importe la configuration qui va faire un pont avec le fichier .env
 import { config } from '../utils/config';
  
@@ -26,7 +28,7 @@ export const AppDataSource = new DataSource({
 
   // Liste des entités (modèles de données) que TypeORM doit gérer 
   // Cette classe est une entité TypeORM et la lie à sa table de base de données
-  entities: [Athlete, User, Programme], 
+  entities: [Athlete, User, Programme, ApiKey], 
 
   //Synchronize: true s'utlise uniquement en dévellopement 
   // Cette option synchronise automatiquement le schéma de la base de données avec vos entités
