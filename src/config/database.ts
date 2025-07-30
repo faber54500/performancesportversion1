@@ -1,4 +1,4 @@
-// config/database.ts 
+// config/database.ts fichier du 30/07/2025
 
 
 // Importe la classe DataSource de TypeORM, qui est le point d'entrée pour la connexion à la DB.
