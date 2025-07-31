@@ -19,5 +19,8 @@
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.24",
     "zod": "^3.25.61"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
   }
 }
