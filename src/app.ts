@@ -9,7 +9,7 @@ import { cors } from 'hono/cors';
 // Ces fichiers de routes devraient exister dans le dossier 'routes'.
 import { publicRoutes } from './routes/public';
 import { privateRoutes } from './routes/private';
-// import { authRoutes } from './routes/auth'; // Pour l'authentification (login/register)
+import { authRoutes } from './routes/auth'; // Pour l'authentification (login/register)
 
 // Crée une nouvelle instance de l'application Hono.
 const app = new Hono();
@@ -41,7 +41,7 @@ app.route('/', publicRoutes);
 // Un middleware d'authentification devrait être appliqué à ce routeur.
 app.route('/', privateRoutes);
 // Enregistre les routes d'authentification (login, register).
-// app.route('/auth', authRoutes);
+app.route('/auth', authRoutes);
 
 /**
  * Gestionnaire d'erreur global
