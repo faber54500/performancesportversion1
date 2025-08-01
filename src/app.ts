@@ -1,59 +1,84 @@
-// app.ts
+// src/app.ts
 
 // Importe la classe Hono pour créer une application web.
 import { Hono } from 'hono';
 // Importe le middleware CORS pour gérer les politiques d'accès entre origines.
 import { cors } from 'hono/cors';
+// Importe le middleware de logs pour un meilleur débogage.
+import { logger } from 'hono/logger';
 
-// Importe les routeurs définis (pour les routes publiques et privées).
-// Ces fichiers de routes devraient exister dans le dossier 'routes'.
+// --- MODIFICATION : Import du middleware d'authentification ---
+import { authMiddleware } from './middlewares/authMiddleware';
+
+// Importe les routeurs définis.
 import { publicRoutes } from './routes/public';
 import { privateRoutes } from './routes/private';
-import { authRoutes } from './routes/auth'; // Pour l'authentification (login/register)
+import { authRoutes } from './routes/auth';
 
 // Crée une nouvelle instance de l'application Hono.
 const app = new Hono();
 
 /**
  * Middlewares globaux
- * Ces middlewares s'appliqueront à toutes les requêtes entrantes.
+ * Appliqués à TOUTES les requêtes.
  */
-
-// Configure le middleware CORS.
-// Pour la PoC, nous autorisons l'accès depuis 'http://localhost:3000' (ou l'origine de votre client).
-// Vous devriez ajuster 'origin' à l'URL de votre frontend en production.
+app.use('*', logger()); // Ajout du logger pour toutes les routes
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'], // Exemple pour React/Vue/Angular en dev
-  allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key'], // Autorise les headers nécessaires
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Autorise les méthodes HTTP
-  maxAge: 600, // Temps de cache pour les requêtes preflight OPTIONS
-  credentials: true, // Autorise l'envoi de cookies et d'en-têtes d'autorisation
+  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  maxAge: 600,
+  credentials: true,
 }));
 
 /**
  * Gestion des routes
- * Les routes sont regroupées logiquement pour maintenir une architecture propre.
+ * On sépare clairement les routes publiques des routes privées.
  */
 
-// Enregistre les routes publiques qui ne nécessitent pas d'authentification.
-app.route('/', publicRoutes);
-// Enregistre les routes privées qui nécessitent une authentification.
-// Un middleware d'authentification devrait être appliqué à ce routeur.
-app.route('/', privateRoutes);
-// Enregistre les routes d'authentification (login, register).
-app.route('/auth', authRoutes);
+// --- ROUTES PUBLIQUES ---
+// Ces routes sont accessibles sans token.
+app.route('/auth', authRoutes); // Routes pour /auth/login, /auth/register
+app.route('/', publicRoutes);   // Autres routes publiques
+
+// --- ROUTES PRIVÉES (PROTÉGÉES) ---
+// On crée un groupe de routes dédié qui sera protégé par le middleware.
+const privateApi = new Hono();
+// On applique le middleware d'authentification à TOUTES les routes de ce groupe.
+privateApi.use('*', authMiddleware);
+// On enregistre les routes privées DANS ce groupe sécurisé.
+privateApi.route('/', privateRoutes);
+
+// On attache le groupe sécurisé à notre application principale.
+app.route('/', privateApi);
+
+// Supprime les doublons et corrige la logique d'exclusion des routes publiques
+app.use('*', async (c, next) => {
+  const publicPaths = ['/auth/login', '/auth/register'];
+  if (publicPaths.includes(c.req.path)) {
+    console.log(`[app.ts] Route publique détectée : ${c.req.path}, middleware ignoré.`);
+    return next();
+  }
+  console.log(`[app.ts] Route protégée détectée : ${c.req.path}, exécution du middleware.`);
+  return authMiddleware(c, next);
+});
+
 
 /**
  * Gestionnaire d'erreur global
- * Capture toutes les erreurs non gérées par les routes spécifiques.
  */
 app.onError((err, c) => {
-  console.error(`${err}`); // Log l'erreur pour le débogage.
-  // Vous pouvez personnaliser la réponse d'erreur en fonction du type d'erreur.
+  console.error(`[Erreur Globale] ${err}`);
   return c.json({ message: 'Une erreur interne du serveur est survenue.', error: err.message }, 500);
 });
 
+/**
+ * Gestionnaire 404 Not Found
+ */
+app.notFound((c) => {
+  return c.json({ message: `Route non trouvée : ${c.req.method} ${c.req.path}` }, 404);
+});
+
+
 // Exporte l'application Hono pour être utilisée dans index.ts.
 export default app;
-
-

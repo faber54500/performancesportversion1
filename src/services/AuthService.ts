@@ -3,6 +3,7 @@
 import { UserRepository } from '../repositories/UserRepository';
 import { hashPassword, comparePassword } from '../utils/bcrypt'; // Importe les utilitaires de hachage Bcrypt
 import { User } from '../entities/User';
+import jwt from 'jsonwebtoken';
 
 /**
  * @class AuthService
@@ -61,20 +62,55 @@ export class AuthService {
    * @returns {Promise<User | null>} L'objet utilisateur si les identifiants sont valides, sinon null.
    */
   async validateUser(email: string, password: string): Promise<User | null> {
+    console.log(`[AuthService] Validation de l'utilisateur : email = ${email}`);
     const user = await this.userRepository.findByEmail(email);
 
-    // Si aucun utilisateur n'est trouvé avec cet email
     if (!user) {
+      console.log(`[AuthService] Utilisateur non trouvé pour l'email : ${email}`);
       return null;
     }
 
-    // Compare le mot de passe fourni avec le mot de passe haché stocké
     const isPasswordValid = await comparePassword(password, user.password);
+    console.log(`[AuthService] Résultat de la validation du mot de passe : ${isPasswordValid}`);
 
     if (!isPasswordValid) {
       return null;
     }
 
     return user;
+  }
+
+  /**
+   * @method login
+   * @description Authentifie un utilisateur en vérifiant ses identifiants.
+   * @param {string} email L'adresse e-mail de l'utilisateur.
+   * @param {string} password Le mot de passe en clair.
+   * @returns {Promise<string>} Un token JWT si l'authentification réussit.
+   * @throws {Error} Si l'utilisateur n'existe pas ou si le mot de passe est incorrect.
+   */
+  async login(email: string, password: string): Promise<string> {
+    console.log(`[AuthService] Tentative de connexion pour l'email : ${email}`);
+
+    // Recherche l'utilisateur par e-mail
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      console.log(`[AuthService] Utilisateur non trouvé pour l'email : ${email}`);
+      throw new Error('Utilisateur non trouvé.');
+    }
+
+    // Vérifie le mot de passe
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) {
+      console.log(`[AuthService] Mot de passe incorrect pour l'email : ${email}`);
+      throw new Error('Mot de passe incorrect.');
+    }
+
+    // Génère un token JWT
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'default_secret', {
+      expiresIn: '1h',
+    });
+
+    console.log(`[AuthService] Token généré avec succès pour l'email : ${email}`);
+    return token;
   }
 }

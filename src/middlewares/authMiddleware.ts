@@ -17,7 +17,11 @@ export const authMiddleware = async (c: Context, next: Next) => {
   // Récupère l'en-tête Authorization de la requête.
   const authHeader = c.req.header('Authorization');
 
+  console.log(`[authMiddleware] Requête reçue : Méthode = ${c.req.method}, URL = ${c.req.url}`);
+  console.log(`[authMiddleware] En-tête Authorization : ${authHeader}`);
+
   if (!authHeader) {
+    console.log(`[authMiddleware] Aucun en-tête Authorization fourni.`);
     // Si l'en-tête Authorization est absent, l'utilisateur n'est pas authentifié.
     return c.json({ message: 'Accès non autorisé: Token non fourni.' }, 401);
   }
@@ -25,14 +29,19 @@ export const authMiddleware = async (c: Context, next: Next) => {
   // Vérifie si l'en-tête est au format 'Bearer <token>'.
   const token = authHeader.split(' ')[1]; // Prend la deuxième partie après 'Bearer '
 
+  console.log(`[authMiddleware] Token extrait : ${token}`);
+
   if (!token) {
     // Si le format est incorrect, renvoie une erreur.
+    console.log(`[authMiddleware] Format de token invalide.`);
     return c.json({ message: 'Accès non autorisé: Format de token invalide (attendu: Bearer <token>).' }, 401);
   }
 
   try {
+    console.log(`[authMiddleware] Vérification du token...`);
     // Vérifie le token JWT et décode son payload.
     const decodedPayload = await verifyToken(token) as UserPayload; // On s'attend à un payload de type UserPayload
+    console.log(`[authMiddleware] Token valide. Payload décodé :`, decodedPayload);
 
     // Attache le payload de l'utilisateur au contexte Hono pour un accès ultérieur
     // dans les contrôleurs ou les middlewares suivants.
@@ -48,7 +57,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
   } catch (error: any) {
     // Gère les erreurs de vérification du token (ex: token expiré, signature invalide).
-    console.error('Erreur de validation du token JWT:', error.message);
+    console.log(`[authMiddleware] Erreur lors de la vérification du token : ${error.message}`);
     if (error.name === 'TokenExpiredError') {
         return c.json({ message: 'Token expiré. Veuillez vous reconnecter.' }, 403); // 403 Forbidden pour token expiré
     }
