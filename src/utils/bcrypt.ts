@@ -1,7 +1,6 @@
 // utils/bcrypt.ts
 
-// Importe la bibliothèque bcryptjs pour le hachage des mots de passe.
-// 'bcryptjs' est une implémentation pure JavaScript de bcrypt, compatible avec Bun.
+// Remplace l'importation de bcrypt par bcryptjs pour la compatibilité avec Bun.
 import bcrypt from 'bcryptjs';
 
 // Nombre de "rounds" (itérations) pour le salage et le hachage de Bcrypt.
