@@ -20,8 +20,10 @@ export class AuthController {
       console.log(`[AuthController] email = ${email}, password = ${password}`);
       const token = await this.authService.login(email, password);
       console.log(`[AuthController] Token généré avec succès : ${token}`);
-      ctx.json({ token });
-    } catch (error) {
+      
+      // Retourne le token dans la réponse JSON
+      return ctx.json({ token });
+    } catch (error: any) {
       console.log(`[AuthController] Erreur lors de la connexion : ${error.message}`);
       throw new HttpException(401, error.message);
     }
@@ -35,8 +37,10 @@ export class AuthController {
     try {
       const { username, email, password, role } = ctx.req.valid('json');
       const user = await this.authService.register(username, email, password, role);
-      ctx.status(201).json(user);
-    } catch (error) {
+      console.log(`[AuthController] Utilisateur enregistré avec succès : ${user.email}`);
+      return ctx.json(user, 201); // Retourne l'utilisateur avec un statut 201
+    } catch (error: any) {
+      console.log(`[AuthController] Erreur lors de l'enregistrement : ${error.message}`);
       throw new HttpException(400, error.message);
     }
   }
