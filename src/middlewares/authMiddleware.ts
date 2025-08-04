@@ -1,8 +1,13 @@
 // middlewares/authMiddleware.ts
+import 'dotenv/config';
 
 import { Context, Next } from 'hono';
 import { verifyToken } from '../utils/jwt'; // Utilitaire pour vérifier les tokens JWT
 import { UserPayload } from '../types'; // Importe l'interface du payload utilisateur
+
+// Charge la clé secrète pour JWT
+const secret = process.env.JWT_SECRET || 'default_secret';
+
 
 /**
  * @function authMiddleware

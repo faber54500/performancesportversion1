@@ -13,6 +13,11 @@ export class Athlete {
    * @PrimaryGeneratedColumn() marque la colonne 'id' comme la clé primaire
    * et indique qu'elle est auto-générée par la base de données.
    */
+  
+  @Column({ name: 'ProgrammeID', type: 'int', nullable: false })
+  programmeID!: number; // ID du programme auquel l'athlète est associé
+  
+  
   @PrimaryGeneratedColumn()
   id!: number; // Le '!' indique que la propriété sera initialisée par TypeORM
 
