@@ -4,7 +4,7 @@
 import { Hono } from 'hono';
 // Importe le contrôleur d'athlètes.
 import { AthleteController } from '../controllers/AthleteController';
-// Importe le middleware d'authentification (à implémenter dans middlewares/authMiddleware.ts).
+// Importe le middleware d'authentification.
 import { authMiddleware } from '../middlewares/authMiddleware';
 // Importe le DataSource TypeORM pour initialiser les dépendances.
 import { AppDataSource } from '../config/database';
@@ -12,9 +12,9 @@ import { AppDataSource } from '../config/database';
 import { AthleteRepository } from '../repositories/AthleteRepository';
 // Importe le service d'athlètes.
 import { AthleteService } from '../services/AthleteService';
-// Importe l'entité Athlete. <-- AJOUTÉE
-import { Athlete } from '../entities/Athlete'; // <-- AJOUTÉE
-// Importe le middleware de validation (si utilisé pour valider les données des requêtes).
+// Importe l'entité Athlete.
+import { Athlete } from '../entities/Athlete';
+// Importe le middleware de validation.
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod'; // Importe Zod pour la définition des schémas de validation
 
@@ -28,7 +28,6 @@ const athleteController = new AthleteController(athleteService); // Le contrôle
 
 /**
  * Schéma Zod pour la validation des données d'un athlète lors de la création/mise à jour.
- * Ceci est un exemple, vous devrez l'adapter à vos besoins réels.
  */
 const athleteSchema = z.object({
   Name: z.string().min(1, 'Le nom est requis.'),
@@ -43,23 +42,24 @@ const athleteSchema = z.object({
   Performance: z.number().int().min(0, 'La performance doit être un entier non négatif.'),
 });
 
-
 /**
- * Routes Privées : Nécessitent une authentification (et potentiellement une autorisation).
- * Toutes les opérations CRUD sont généralement placées ici.
+ * Routes Privées : Nécessitent une authentification.
  */
 
-// Applique le middleware d'authentification à toutes les routes définies après ce point
-// dans ce routeur 'privateRoutes'.
+// Applique le middleware d'authentification à toutes les routes définies après ce point.
 privateRoutes.use(authMiddleware);
 
+// Route pour récupérer un programme par son ID (GET).
+privateRoutes.get('/programme/:id', (c) => {
+  const programmeId = c.req.param('id');
+  return c.json({ message: `Programme demandé : ${programmeId}` });
+});
+
 // Route pour créer un nouvel athlète (POST).
-// Utilise zValidator pour valider le corps de la requête par rapport au athleteSchema.
 privateRoutes.post('/athletes', zValidator('json', athleteSchema), athleteController.createAthlete.bind(athleteController));
 
 // Route pour mettre à jour un athlète existant par son ID (PUT).
-// Utilise zValidator pour valider le corps de la requête.
-privateRoutes.put('/athletes/:id', zValidator('json', athleteSchema.partial()), athleteController.updateAthlete.bind(athleteController)); // .partial() permet de valider un sous-ensemble des champs
+privateRoutes.put('/athletes/:id', zValidator('json', athleteSchema.partial()), athleteController.updateAthlete.bind(athleteController));
 
 // Route pour supprimer un athlète par son ID (DELETE).
 privateRoutes.delete('/athletes/:id', athleteController.deleteAthlete.bind(athleteController));
