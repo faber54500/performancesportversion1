@@ -75,10 +75,11 @@ export class AthleteController {
    * @returns Une réponse JSON confirmant la création de l'athlète.
    */
   public async createAthlete(c: Context) {
-    // Ici, vous vérifieriez l'authentification et l'autorisation avant de continuer.
-    // Ex: validation du token JWT dans un middleware d'authentification.
-    // if (!c.get('user')) { return c.json({ message: 'Non autorisé' }, 401); }
-
+    // Vérification du rôle : seul un admin peut créer
+    const user = c.get('user');
+    if (!user || user.role !== 'admin') {
+      return c.json({ message: 'Accès refusé : seul un admin peut créer un athlète.' }, 403);
+    }
     try {
       // Parse le corps de la requête pour obtenir les données de l'athlète.
       // Un middleware de validation (ex: Zod) serait utilisé ici pour valider le schéma des données.
@@ -105,7 +106,11 @@ export class AthleteController {
    * @returns Une réponse JSON confirmant la mise à jour ou un message d'erreur.
    */
   public async updateAthlete(c: Context) {
-    // Vérification d'authentification et d'autorisation ici.
+    // Vérification du rôle : seul un admin peut modifier
+    const user = c.get('user');
+    if (!user || user.role !== 'admin') {
+      return c.json({ message: 'Accès refusé : seul un admin peut modifier un athlète.' }, 403);
+    }
     try {
       const id = parseInt(c.req.param('id'));
       if (isNaN(id)) {
@@ -142,7 +147,11 @@ export class AthleteController {
    * @returns Une réponse JSON confirmant la suppression ou un message d'erreur.
    */
   public async deleteAthlete(c: Context) {
-    // Vérification d'authentification et d'autorisation ici.
+    // Vérification du rôle : seul un admin peut supprimer
+    const user = c.get('user');
+    if (!user || user.role !== 'admin') {
+      return c.json({ message: 'Accès refusé : seul un admin peut supprimer un athlète.' }, 403);
+    }
     try {
       const id = parseInt(c.req.param('id'));
       if (isNaN(id)) {
@@ -158,9 +167,8 @@ export class AthleteController {
 
       // Supprime l'athlète.
       await this.athleteRepository.remove(athlete);
-
-      // Retourne une réponse 204 No Content pour indiquer une suppression réussie sans corps de réponse.
-      return c.json({ message: 'Athlète supprimé avec succès.' }, 204);
+      // Retourne une réponse 200 OK pour indiquer une suppression réussie.
+      return c.json({ message: 'Athlète supprimé avec succès.' }, 200);
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'athlète:', error);
       return c.json({ message: 'Erreur interne du serveur lors de la suppression de l\'athlète.' }, 500);

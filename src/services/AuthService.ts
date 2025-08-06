@@ -106,9 +106,13 @@ export class AuthService {
     }
 
     // Génère un token JWT
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'default_secret', {
-      expiresIn: '1h',
-    });
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role }, // Ajoute le rôle dans le payload
+      process.env.JWT_SECRET || 'default_secret',
+      {
+        expiresIn: '1h',
+      }
+    );
 
     console.log(`[AuthService] Token généré avec succès pour l'email : ${email}`);
     return token;
