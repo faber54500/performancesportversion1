@@ -69,5 +69,26 @@ privateRoutes.delete('/athletes/:id', athleteAccessControl, athleteController.de
 // Route pour lire un athlète par son ID (GET).
 privateRoutes.get('/athletes/:id', athleteAccessControl, athleteController.getAthleteById.bind(athleteController));
 
+// Route privée pour filtrer les athlètes selon le rôle/id utilisateur
+privateRoutes.get('/athletes/filter', async (c) => {
+  // Récupère l'utilisateur depuis le contexte (typage any pour compatibilité)
+  const user: any = c.get('user');
+  if (!user) {
+    return c.json({ message: 'Authentification requise.' }, 401);
+  }
+  // Appelle la méthode du contrôleur dédiée au filtrage
+  return await athleteController.getFilteredAthletes(c);
+});
+
+// Route pour récupérer les athlètes selon l'id utilisateur passé en paramètre
+privateRoutes.get('/users/:id/athletes', async (c) => {
+  const userId = parseInt(c.req.param('id'));
+  if (isNaN(userId)) {
+    return c.json({ message: 'ID utilisateur invalide.' }, 400);
+  }
+  // Appelle la méthode du contrôleur dédiée au filtrage par id
+  return await athleteController.getFilteredAthletesById(c, userId);
+});
+
 // Exporte le routeur privé.
 export { privateRoutes };

@@ -44,14 +44,6 @@ export const AppDataSource = new DataSource({
    * Ex: `logging: ['query', 'error']`
    */
   logging: false,
-
-  /**
-   * Autres options courantes :
-   * `migrations`: Pour gérer les migrations de base de données en production.
-   * `subscribers`: Pour les écouteurs d'événements TypeORM.
-   * `extra`: Options spécifiques au pilote de base de données.
-   * `cli`: Configuration pour les commandes CLI de TypeORM.
-   */
 });
 
 // AppDataSource sera ensuite initialisé dans `index.ts` avant le démarrage du serveur.

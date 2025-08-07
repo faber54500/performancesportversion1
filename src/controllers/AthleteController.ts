@@ -175,4 +175,68 @@ export class AthleteController {
       return c.json({ message: 'Erreur interne du serveur lors de la suppression de l\'athlète.' }, 500);
     }
   }
+
+  /**
+   * Méthode pour filtrer les athlètes selon le rôle/id utilisateur.
+   * admin : tous, user1 : impairs, user2 : pairs
+   */
+  public async getFilteredAthletes(c: Context) {
+    // Récupère l'utilisateur depuis le contexte (typage any pour compatibilité)
+    const user: any = c.get('user');
+    if (!user) {
+      return c.json({ message: 'Authentification requise.' }, 401);
+    }
+    try {
+      let athletes = await this.athleteRepository.find();
+      if (user.role === 'admin') {
+        // Admin : accès total
+        return c.json(athletes, 200);
+      } else if (user.id === 1) {
+        // user1 : impairs
+        athletes = athletes.filter(a => a.id % 2 === 1);
+        return c.json(athletes, 200);
+      } else if (user.id === 2) {
+        // user2 : pairs
+        athletes = athletes.filter(a => a.id % 2 === 0);
+        return c.json(athletes, 200);
+      } else {
+        return c.json({ message: 'Rôle ou id utilisateur non autorisé.' }, 403);
+      }
+    } catch (error) {
+      console.error('Erreur lors du filtrage des athlètes:', error);
+      return c.json({ message: 'Erreur interne du serveur lors du filtrage des athlètes.' }, 500);
+    }
+  }
+
+  /**
+   * Méthode pour filtrer les athlètes selon l'id utilisateur passé en paramètre.
+   * id=1 : impairs, id=2 : pairs, admin : tous
+   */
+  public async getFilteredAthletesById(c: Context, userId: number) {
+    // Récupère l'utilisateur authentifié depuis le contexte
+    const user: any = c.get('user');
+    if (!user) {
+      return c.json({ message: 'Authentification requise.' }, 401);
+    }
+    try {
+      let athletes = await this.athleteRepository.find();
+      if (user.role === 'admin') {
+        // Admin : accès total
+        return c.json(athletes, 200);
+      } else if (userId === 1) {
+        // user1 : impairs
+        athletes = athletes.filter(a => a.id % 2 === 1);
+        return c.json(athletes, 200);
+      } else if (userId === 2) {
+        // user2 : pairs
+        athletes = athletes.filter(a => a.id % 2 === 0);
+        return c.json(athletes, 200);
+      } else {
+        return c.json({ message: 'Rôle ou id utilisateur non autorisé.' }, 403);
+      }
+    } catch (error) {
+      console.error('Erreur lors du filtrage des athlètes par id:', error);
+      return c.json({ message: 'Erreur interne du serveur lors du filtrage des athlètes.' }, 500);
+    }
+  }
 }
