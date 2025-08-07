@@ -32,8 +32,5 @@ const athleteController = new AthleteController(athleteService); // Le contrôle
 // se réfère correctement à l'instance du contrôleur.
 publicRoutes.get('/athletes', athleteController.getAllAthletes.bind(athleteController));
 
-// Route pour récupérer un athlète par son ID.
-publicRoutes.get('/athletes/:id', athleteController.getAthleteById.bind(athleteController));
-
 // Exporte le routeur public pour être utilisé dans app.ts.
 export { publicRoutes };

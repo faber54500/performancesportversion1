@@ -17,6 +17,7 @@ import { Athlete } from '../entities/Athlete';
 // Importe le middleware de validation.
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod'; // Importe Zod pour la définition des schémas de validation
+import { athleteAccessControl } from '../middlewares/athleteAccessControl';
 
 // Crée une nouvelle instance de routeur Hono.
 const privateRoutes = new Hono();
@@ -52,6 +53,7 @@ privateRoutes.use(authMiddleware);
 // Route pour récupérer un programme par son ID (GET).
 privateRoutes.get('/programme/:id', (c) => {
   const programmeId = c.req.param('id');
+  console.log(`[privateRoutes] Requête reçue pour le programme ID : ${programmeId}`);
   return c.json({ message: `Programme demandé : ${programmeId}` });
 });
 
@@ -59,10 +61,13 @@ privateRoutes.get('/programme/:id', (c) => {
 privateRoutes.post('/athletes', zValidator('json', athleteSchema), athleteController.createAthlete.bind(athleteController));
 
 // Route pour mettre à jour un athlète existant par son ID (PUT).
-privateRoutes.put('/athletes/:id', zValidator('json', athleteSchema.partial()), athleteController.updateAthlete.bind(athleteController));
+privateRoutes.put('/athletes/:id', athleteAccessControl, zValidator('json', athleteSchema.partial()), athleteController.updateAthlete.bind(athleteController));
 
 // Route pour supprimer un athlète par son ID (DELETE).
-privateRoutes.delete('/athletes/:id', athleteController.deleteAthlete.bind(athleteController));
+privateRoutes.delete('/athletes/:id', athleteAccessControl, athleteController.deleteAthlete.bind(athleteController));
+
+// Route pour lire un athlète par son ID (GET).
+privateRoutes.get('/athletes/:id', athleteAccessControl, athleteController.getAthleteById.bind(athleteController));
 
 // Exporte le routeur privé.
 export { privateRoutes };

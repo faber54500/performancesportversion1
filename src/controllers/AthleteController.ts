@@ -44,6 +44,7 @@ export class AthleteController {
    * @returns Une réponse JSON contenant l'athlète trouvé ou un message d'erreur.
    */
   public async getAthleteById(c: Context) {
+    console.log('[AthleteController] getAthleteById appelé, params:', c.req.param('id'), 'user:', c.get('user'));
     try {
       // Récupère l'ID depuis les paramètres de l'URL et le convertit en nombre.
       const id = parseInt(c.req.param('id'));
